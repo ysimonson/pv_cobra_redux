@@ -1,0 +1,3 @@
+[submodule "resources/cobra"]
+	path = resources/cobra
+	url = https://github.com/Picovoice/cobra.git
