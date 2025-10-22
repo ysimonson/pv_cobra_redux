@@ -1,12 +1,11 @@
-use std::cmp::min;
-use std::{env, thread};
 use std::sync::{Arc, Mutex, TryLockError};
 use std::time::Duration;
+use std::{env, thread};
 
-use anyhow::{bail, Context, Result};
-use clap::{command, Parser};
-use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+use anyhow::{Context, Result, bail};
+use clap::{Parser, command};
 use cpal::Sample;
+use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use indicatif::ProgressBar;
 
 struct AudioInputProcessor {
@@ -17,7 +16,12 @@ struct AudioInputProcessor {
 }
 
 impl AudioInputProcessor {
-    fn new(input_sample_rate: u32, frame_length: usize, channels: usize, access_key: String) -> Result<Self> {
+    fn new(
+        input_sample_rate: u32,
+        frame_length: usize,
+        channels: usize,
+        access_key: String,
+    ) -> Result<Self> {
         Ok(Self {
             resampler: samplerate::Samplerate::new(
                 samplerate::ConverterType::SincBestQuality,
@@ -35,7 +39,9 @@ impl AudioInputProcessor {
 unsafe impl Send for AudioInputProcessor {}
 
 fn convert_samples_to_f32<S: cpal::Sample>(data: &[S]) -> Vec<f32> {
-    data.iter().map(|s| s.to_float_sample().to_sample()).collect()
+    data.iter()
+        .map(|s| s.to_float_sample().to_sample())
+        .collect()
 }
 
 #[derive(Parser)]
@@ -92,7 +98,8 @@ fn main() -> Result<()> {
         Device::new_from_default_device()
     };
     let device = device?.context("mic device not found")?;
-    let access_key = env::var("PICOVOICE_ACCESS_KEY").context("missing environment variable `PICOVOICE_ACCESS_KEY`")?;
+    let access_key = env::var("PICOVOICE_ACCESS_KEY")
+        .context("missing environment variable `PICOVOICE_ACCESS_KEY`")?;
     let channels = device.config.channels();
     let frame_length = pv_cobra_redux::sample_rate() as usize;
 
@@ -100,7 +107,7 @@ fn main() -> Result<()> {
         device.config.sample_rate().0,
         frame_length,
         channels as usize,
-        access_key
+        access_key,
     )?));
 
     let add_samples = move |samples: &[f32]| -> Result<()> {
@@ -187,7 +194,7 @@ fn main() -> Result<()> {
             handle_err,
             None,
         )?,
-        sample_format => bail!("unsupported format: {sample_format}")
+        sample_format => bail!("unsupported format: {sample_format}"),
     };
 
     println!("VAD confidence:");

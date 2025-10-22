@@ -6,21 +6,15 @@ use std::fmt;
 use std::ptr;
 
 pub fn sample_rate() -> i32 {
-    unsafe {
-        ffi::pv_sample_rate()
-    }
+    unsafe { ffi::pv_sample_rate() }
 }
 
 pub fn frame_length() -> i32 {
-    unsafe {
-        ffi::pv_cobra_frame_length()
-    }
+    unsafe { ffi::pv_cobra_frame_length() }
 }
 
 pub fn lib_version() -> &'static str {
-    let cstr = unsafe {
-        CStr::from_ptr(ffi::pv_cobra_version())
-    };
+    let cstr = unsafe { CStr::from_ptr(ffi::pv_cobra_version()) };
     cstr.to_str().unwrap()
 }
 
@@ -53,9 +47,7 @@ impl Cobra {
     pub fn new<S: Into<Vec<u8>>>(access_key: S) -> Result<Self, Error> {
         let access_key = CString::new(access_key).map_err(|_err| Error::NullValue)?;
         let mut cobra: *mut ffi::pv_cobra = ptr::null_mut();
-        let status = unsafe {
-            ffi::pv_cobra_init(access_key.as_ptr(), &mut cobra)
-        };
+        let status = unsafe { ffi::pv_cobra_init(access_key.as_ptr(), &mut cobra) };
         if status != 0 {
             Err(Error::NonZeroStatus(status))
         } else if cobra.is_null() {
@@ -67,9 +59,7 @@ impl Cobra {
 
     pub fn process(&mut self, pcm: &[i16]) -> Result<f32, Error> {
         let mut confidence: f32 = 0.0;
-        let status = unsafe {
-            ffi::pv_cobra_process(self.cobra, pcm.as_ptr(), &mut confidence)
-        };
+        let status = unsafe { ffi::pv_cobra_process(self.cobra, pcm.as_ptr(), &mut confidence) };
         if status != 0 {
             Err(Error::NonZeroStatus(status))
         } else {
@@ -85,7 +75,6 @@ impl Drop for Cobra {
         }
     }
 }
-
 
 #[cfg(test)]
 mod test {

@@ -1,4 +1,3 @@
-
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -7,7 +6,7 @@ use std::process::Command;
 fn main() {
     if !Path::new("resources/cobra/.git").exists() {
         let _ = Command::new("git")
-            .args(&["submodule", "update", "--init"])
+            .args(["submodule", "update", "--init"])
             .status();
     }
 
@@ -31,8 +30,12 @@ fn main() {
         panic!("Expected library not found at {:?}", src_lib_path);
     }
     let dst_lib_path = out_dir.join(&lib_name);
-    fs::copy(&src_lib_path, &dst_lib_path)
-        .unwrap_or_else(|e| panic!("Failed to copy {:?} to {:?}: {}", src_lib_path, dst_lib_path, e));
+    fs::copy(&src_lib_path, &dst_lib_path).unwrap_or_else(|e| {
+        panic!(
+            "Failed to copy {:?} to {:?}: {}",
+            src_lib_path, dst_lib_path, e
+        )
+    });
 
     println!("cargo:rustc-link-search=native={}", out_dir.display());
     println!("cargo:rustc-link-lib=dylib=pv_cobra");
