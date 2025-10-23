@@ -15,6 +15,3 @@ samplerate = "0.2.4"
 anyhow = "^1.0.94"
 clap = { version = "4.5.23", features = ["derive"] }
 indicatif = "0.18.0"
-
-[build-dependencies]
-bindgen = "0.71.0"

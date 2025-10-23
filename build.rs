@@ -39,16 +39,5 @@ fn main() {
 
     println!("cargo:rustc-link-search=native={}", out_dir.display());
     println!("cargo:rustc-link-lib=dylib=pv_cobra");
-
-    bindgen::Builder::default()
-        .header("resources/cobra/include/picovoice.h")
-        .header("resources/cobra/include/pv_cobra.h")
-        .generate()
-        .expect("Unable to generate bindings")
-        .write_to_file(out_dir.join("bindings.rs"))
-        .expect("Couldn't write bindings");
-
     println!("cargo:rerun-if-changed={}", src_lib_path.display());
-    println!("cargo:rerun-if-changed=resources/cobra/include/picovoice.h");
-    println!("cargo:rerun-if-changed=resources/cobra/include/pv_cobra.h");
 }
